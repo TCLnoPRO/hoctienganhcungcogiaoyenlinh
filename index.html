@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>English Learning</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+margin:0;
+text-align:center;
+}
+
+header{
+background:#58cc02;
+color:white;
+padding:15px;
+font-size:24px;
+font-weight:bold;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+margin-top:30px;
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input{
+padding:10px;
+margin:5px;
+width:200px;
+}
+
+button{
+padding:10px 20px;
+margin:10px;
+border:none;
+border-radius:8px;
+background:#58cc02;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#46a000;
+}
+
+.option{
+background:#eee;
+margin:10px;
+padding:15px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.option:hover{
+background:#d6ffd0;
+}
+
+.correct{
+background:#9cff9c !important;
+}
+
+.wrong{
+background:#ff9c9c !important;
+}
+
+.progress{
+height:20px;
+background:#ddd;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:20px;
+}
+
+.bar{
+height:100%;
+background:#58cc02;
+width:0%;
+}
+
+.stats{
+margin-top:15px;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+🌍 English Learning
+</header>
+
+<div class="container" id="login">
+
+<h2>Login</h2>
+
+<input id="username" placeholder="Username"><br>
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<div class="container" id="app" style="display:none">
+
+<div class="progress">
+<div class="bar" id="progress"></div>
+</div>
+
+<h2 id="question"></h2>
+
+<div id="options"></div>
+
+<div class="stats">
+⭐ XP: <span id="xp"></span>
+|
+❤️ Lives: <span id="lives"></span>
+|
+🔥 Streak: <span id="streak"></span>
+</div>
+
+<button onclick="next()">Next</button>
+
+</div>
+
+<script>
+
+let xp=0
+let lives=3
+let streak=0
+let current=0
+
+const lessons=[
+
+{
+q:"Apple means?",
+o:["Táo","Chuối","Cam","Xoài"],
+a:0
+},
+
+{
+q:"Dog means?",
+o:["Mèo","Chó","Ngựa","Cá"],
+a:1
+},
+
+{
+q:"Book means?",
+o:["Bút","Sách","Ghế","Cửa"],
+a:1
+},
+
+{
+q:"Hello means?",
+o:["Xin chào","Cảm ơn","Xin lỗi","Tạm biệt"],
+a:0
+}
+
+]
+
+function login(){
+
+let user=document.getElementById("username").value
+
+if(user=="") return
+
+localStorage.setItem("user",user)
+
+document.getElementById("login").style.display="none"
+
+document.getElementById("app").style.display="block"
+
+start()
+
+}
+
+function start(){
+
+xp=Number(localStorage.getItem("xp"))||0
+streak=Number(localStorage.getItem("streak"))||0
+
+document.getElementById("xp").innerText=xp
+document.getElementById("lives").innerText=lives
+document.getElementById("streak").innerText=streak
+
+load()
+
+}
+
+function load(){
+
+let q=lessons[current]
+
+document.getElementById("question").innerText=q.q
+
+let html=""
+
+q.o.forEach((op,i)=>{
+
+html+=`<div class="option" onclick="answer(${i},this)">${op}</div>`
+
+})
+
+document.getElementById("options").innerHTML=html
+
+updateBar()
+
+}
+
+function answer(i,el){
+
+let q=lessons[current]
+
+if(i==q.a){
+
+el.classList.add("correct")
+
+xp+=10
+streak++
+
+speak("Correct")
+
+}else{
+
+el.classList.add("wrong")
+
+lives--
+streak=0
+
+speak("Wrong")
+
+}
+
+document.getElementById("xp").innerText=xp
+document.getElementById("lives").innerText=lives
+document.getElementById("streak").innerText=streak
+
+localStorage.setItem("xp",xp)
+localStorage.setItem("streak",streak)
+
+if(lives<=0){
+
+alert("Game Over")
+
+location.reload()
+
+}
+
+}
+
+function next(){
+
+current++
+
+if(current>=lessons.length){
+
+alert("Lesson Complete!")
+
+location.reload()
+
+}
+
+load()
+
+}
+
+function updateBar(){
+
+let p=(current/lessons.length)*100
+
+document.getElementById("progress").style.width=p+"%"
+
+}
+
+function speak(text){
+
+let s=new SpeechSynthesisUtterance(text)
+
+s.lang="en-US"
+
+speechSynthesis.speak(s)
+
+}
+
+</script>
+
+</body>
+</html>
